@@ -1,0 +1,62 @@
+---
+title: "Final project"
+author: "Griffin Sun"
+date: "4/19/2022"
+output: html_document
+---
+```{r}
+#install.packages("tidyverse")
+#install.packages("ggplot2")
+#install.packages("dplyr")
+#install.packages("lubridate")
+#install.packages("patchwork")
+```
+```{r}
+#load packages
+library(lubridate)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(patchwork)
+```
+
+```{r}
+#load data
+dat<-read.csv("Spot_Prices.csv")
+obs<-mdy(dat$day)
+```
+
+```{r}
+#individual lines
+PPG_oil<-"#003f5c"
+PPG_gas<-"#ff6361"
+gas_price<-ggplot(dat,aes(x=obs,y=gasp,group=1))+geom_line(size=.25,color=PPG_gas)
+oil_price<-ggplot(dat,aes(x=obs,y=oilp,group=1))+geom_line(size=.25,color=PPG_oil)
+gas_price
+oil_price
+```
+
+```{r}
+#combines lines
+oiletgas<-ggplot(dat,aes(x=obs,group=1))+
+  geom_line(aes(y=gasp,group=1), size=.25,color=PPG_gas)+
+  geom_line(aes(y=oilp/42,group=1), size=.25, color=PPG_oil)+
+  labs(title = "Combined Oil and Gas prices",x="Year",y="Price per Gallon")
+  
+oiletgas
+
+```
+
+```{r}
+#scatter & regression
+ogas<-"#b14939"
+oil_v_gas<-ggplot(dat,aes(y=gasp,x=oilp/42,group=1))+geom_point(size=.5,color=ogas) + geom_smooth(method=lm,se=FALSE,color="#95d23e",linetype='solid')+theme_bw()+
+  labs(title="Oil Vs Gas Prices",x="Oil ($/Gallon)",y="Gas ($/Gallon)")
+oil_v_gas
+```
+```{r}
+#regression data
+m1<-lm(dat$gasp~dat$oilp)
+summary(m1)
+```
+
